@@ -12,7 +12,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user.name}')
+    print(f'Giriş yapıldı:  {bot.user.name}')
 
 @bot.command()
 async def go(ctx):
@@ -22,52 +22,52 @@ async def go(ctx):
         if chance == 1:
             pokemon = Pokemon(author)
         elif chance == 2:
-            pokemon = Wizard(author)
+            pokemon = Sihirbaz(author)
         elif chance == 3:
-            pokemon = Fighter(author)
-        await ctx.send(await pokemon.info())
-        image_url = await pokemon.show_img()
+            pokemon = Dovuscu(author)
+        await ctx.send(await pokemon.bilgi())
+        image_url = await pokemon.resmi_goster()
         if image_url:
             embed = discord.Embed()
             embed.set_image(url=image_url)
             await ctx.send(embed=embed)
         else:
-            await ctx.send("Не удалось загрузить изображение покемона.")
+            await ctx.send("Pokemon'un görüntüsü yüklenemedi.")
     else:
-        await ctx.send("Ты уже создал себе покемона.")
+        await ctx.send("Zaten bir Pokemon oluşturdunuz.")
 
 @bot.command()
-async def attack(ctx):
+async def saldir(ctx):
     target = ctx.message.mentions[0] if ctx.message.mentions else None
     if target:
         if target.name in Pokemon.pokemons and ctx.author.name in Pokemon.pokemons:
             enemy = Pokemon.pokemons[target.name]
             attacker = Pokemon.pokemons[ctx.author.name]
-            result = await attacker.attack(enemy)
+            result = await attacker.saldir(enemy)
             await ctx.send(result)
         else:
-            await ctx.send("Оба участника должны иметь покемонов для сражения!")
+            await ctx.send("Savaşmak için her iki katılımcının da Pokemon'a sahip olması gerekir!")
     else:
-        await ctx.send("Укажите пользователя, которого хотите атаковать, упомянув его.")
+        await ctx.send("Saldırmak istediğiniz kullanıcıyı etiketleyerek belirtin.")
 
 @bot.command()
-async def info(ctx):
+async def bilgi(ctx):
     author = ctx.author.name
     if author in Pokemon.pokemons:
         pokemon = Pokemon.pokemons[author]
-        await ctx.send(await pokemon.info())
+        await ctx.send(await pokemon.bilgi())
     else:
-        await ctx.send("У вас нет покемона!")
+        await ctx.send("Pokémon'un yok!")
 
 @bot.command()
-async def feed(ctx):
+async def besle(ctx):
     author = ctx.author.name
     if author in Pokemon.pokemons:
         pokemon = Pokemon.pokemons[author]
         response = await pokemon.feed()
         await ctx.send(response)
     else:
-        await ctx.send("У вас нет покемона!")
+        await ctx.send("Pokémon'un yok!")
 
 
 bot.run(token)
