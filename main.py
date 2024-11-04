@@ -64,7 +64,7 @@ async def besle(ctx):
     author = ctx.author.name
     if author in Pokemon.pokemons:
         pokemon = Pokemon.pokemons[author]
-        response = await pokemon.feed()
+        response = await pokemon.besle()
         await ctx.send(response)
     else:
         await ctx.send("Pokémon'un yok!")
