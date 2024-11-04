@@ -17,19 +17,19 @@ async def on_ready():
 @bot.command()
 async def go(ctx):
     author = ctx.author.name
-    if author not in Pokemon.pokemons:
-        chance = random.randint(1, 3)
-        if chance == 1:
+    if author not in Pokemon.pokemonlar:
+        sans = random.randint(1, 3)
+        if sans == 1:
             pokemon = Pokemon(author)
-        elif chance == 2:
+        elif sans == 2:
             pokemon = Sihirbaz(author)
-        elif chance == 3:
+        elif sans == 3:
             pokemon = Dovuscu(author)
         await ctx.send(await pokemon.bilgi())
-        image_url = await pokemon.resmi_goster()
-        if image_url:
+        resim_url = await pokemon.resmi_goster()
+        if resim_url:
             embed = discord.Embed()
-            embed.set_image(url=image_url)
+            embed.set_image(url=resim_url)
             await ctx.send(embed=embed)
         else:
             await ctx.send("Pokemon'un görüntüsü yüklenemedi.")
@@ -40,11 +40,11 @@ async def go(ctx):
 async def saldir(ctx):
     target = ctx.message.mentions[0] if ctx.message.mentions else None
     if target:
-        if target.name in Pokemon.pokemons and ctx.author.name in Pokemon.pokemons:
-            enemy = Pokemon.pokemons[target.name]
-            attacker = Pokemon.pokemons[ctx.author.name]
-            result = await attacker.saldir(enemy)
-            await ctx.send(result)
+        if target.name in Pokemon.pokemonlar and ctx.author.name in Pokemon.pokemonlar:
+            dusman = Pokemon.pokemonlar[target.name]
+            saldirgan = Pokemon.pokemonlar[ctx.author.name]
+            sonuc = await attacker.saldir(dusman)
+            await ctx.send(sonuc)
         else:
             await ctx.send("Savaşmak için her iki katılımcının da Pokemon'a sahip olması gerekir!")
     else:
@@ -53,8 +53,8 @@ async def saldir(ctx):
 @bot.command()
 async def bilgi(ctx):
     author = ctx.author.name
-    if author in Pokemon.pokemons:
-        pokemon = Pokemon.pokemons[author]
+    if author in Pokemon.pokemonlar:
+        pokemon = Pokemon.pokemonlar[author]
         await ctx.send(await pokemon.bilgi())
     else:
         await ctx.send("Pokémon'un yok!")
@@ -62,10 +62,10 @@ async def bilgi(ctx):
 @bot.command()
 async def besle(ctx):
     author = ctx.author.name
-    if author in Pokemon.pokemons:
-        pokemon = Pokemon.pokemons[author]
-        response = await pokemon.besle()
-        await ctx.send(response)
+    if author in Pokemon.pokemonlar:
+        pokemon = Pokemon.pokemonlar[author]
+        yanit = await pokemon.besle()
+        await ctx.send(yanit)
     else:
         await ctx.send("Pokémon'un yok!")
 
