@@ -78,9 +78,9 @@ class Dovuscu(Pokemon):
     async def saldir(self, dusman):
         super_guc  = randint(5, 15)
         self.guc  += super_guc 
-        result = await super().saldir(dusman)
+        sonuc = await super().saldir(dusman)
         self.guc -= super_guc
-        return result + f"\nDovuscu Pokémon süper saldırı kullandı. Eklenen guc: {super_guc}"
+        return sonuc + f"\nDovuscu Pokémon süper saldırı kullandı. Eklenen guc: {super_guc}"
     
     async def besle(self):
         return await super().besle(besleme_araligi=10)
