@@ -5,31 +5,32 @@ from datetime import datetime, timedelta
 
 
 class Pokemon:
-    pokemonlar = {}
+    pokemons = {}
 
-    def __init__(self, pokemon_egitmeni):
-        self.pokemon_egitmeni = pokemon_egitmeni
-        self.pokemon_numarasi = random.randint(1, 1000)
-        self.isim = None
+    def __init__(self, pokemon_trainer):
+        self.pokemon_trainer = pokemon_trainer
+        self.pokemon_number = random.randint(1, 1000)
+        self.name = None
         self.img = None
-        self.guc  = random.randint(30, 60)
+        self.power = random.randint(30, 60)
         self.hp = random.randint(200, 400)
-        self.son_besleme_zamani  = datetime.now()
-        if pokemon_egitmeni  not in self.pokemonlar:
-            self.pokemonlar[pokemon_egitmeni] = self
+        self.last_feed_time  = datetime.now()
+        if pokemon_trainer not in self.pokemons:
+            self.pokemons[pokemon_trainer] = self
 
-    async def besle(self, besleme_araligi=60, hp_artir=10):
-        guncel_zaman  = datetime.now()
-        delta_zaman  = timedelta(seconds=besleme_araligi)
-        if (guncel_zaman - self.son_besleme_zamani) > delta_zaman:
-            self.hp += hp_artir
-            self.son_besleme_zamani = guncel_zaman
-            return f"Pokémon'un sağlığı geri yüklenir. Mevcut HP: {self.hp}"
+
+    async def feed(self, feed_interval=60, hp_increase=10):
+        current_time = datetime.now()
+        delta_time = timedelta(seconds=feed_interval)
+        if (current_time - self.last_feed_time) > delta_time:
+            self.hp += hp_increase
+            self.last_feed_time = current_time
+            return f"Pokémon'un sağlığı geri yüklenir. Mevcut sağlık: {self.hp}"
         else:
-            return f"Pokémonunuzu şu zaman besleyebilirsiniz:{guncel_zaman -delta_zaman }"
+            return f"Pokémonunuzu şu zaman besleyebilirsiniz: {current_time+delta_time}"
 
-    async def isim_al(self):
-        url = f'https://pokeapi.co/api/v2/pokemon/{self.pokemon_numarasi}'
+    async def get_name(self):
+        url = f'https://pokeapi.co/api/v2/pokemon/{self.pokemon_number}'
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status == 200:
@@ -38,49 +39,49 @@ class Pokemon:
                 else:
                     return "Pikachu"
 
-    async def bilgi(self):
-        if not self.isim:
-            self.isim = await self.isim_al()
-        return f"""Pokémon'un ismi: {self.isim}
+    async def info(self):
+        if not self.name:
+            self.name = await self.get_name()
+        return f"""Pokémon'un ismi: {self.name}
                 Pokémon'un gücü: {self.power}
                 Pokémon'un sağlığı: {self.hp}"""
 
-    async def resmi_goster(self):
-        url = f'https://pokeapi.co/api/v2/pokemon/{self.pokemon_numarasi}'
+    async def show_img(self):
+        url = f'https://pokeapi.co/api/v2/pokemon/{self.pokemon_number}'
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status == 200:
                     data = await response.json()
-                    resim_url = data['sprites']['front_default']
-                    return resim_url   
+                    img_url = data['sprites']['front_default']
+                    return img_url 
                 else:
                     return None
 
-    async def saldir(self, dusman):
-        if isinstance(dusman, Sihirbaz):
-            sans = randint(1, 5)
-            if sans == 1:
+    async def attack(self, enemy):
+        if isinstance(enemy, Wizard):
+            chance = randint(1, 5)
+            if chance == 1:
                 return "Sihirbaz Pokémon, savaşta bir kalkan kullandı!"
-        if dusman.hp > self.guc:
-            dusman.hp -= self.guc
-            return f"Pokémon eğitmeni @{self.pokemon_egitmeni} @{dusman.pokemon_egitmeni}'ne saldırdı\n@{dusman.pokemon_egitmeni}'nin sağlık durumu şimdi {dusman.hp}"
+        if enemy.hp > self.power:
+            enemy.hp -= self.power
+            return f"Pokémon eğitmeni @{self.pokemon_trainer} @{enemy.pokemon_trainer}'ne saldırdı\n@{enemy.pokemon_trainer}'nin sağlık durumu şimdi {enemy.hp}"
         else:
-            dusman.hp = 0
-            return f"Pokémon eğitmeni @{self.pokemon_egitmeni} @{dusman.pokemon_egitmeni}'ni yendi!"
+            enemy.hp = 0
+            return f"Pokémon eğitmeni @{self.pokemon_trainer} @{enemy.pokemon_trainer}'ni yendi!"
 
 
-class Sihirbaz(Pokemon):
-    async def besle(self):
-        return await super().besle(hp_artir=20)
+class Wizard(Pokemon):
+    async def feed(self):
+        return await super().feed(hp_increase=20)
 
 
-class Dovuscu(Pokemon):
-    async def saldir(self, dusman):
-        super_guc  = randint(5, 15)
-        self.guc  += super_guc 
-        sonuc = await super().saldir(dusman)
-        self.guc -= super_guc
-        return sonuc + f"\nDovuscu Pokémon süper saldırı kullandı. Eklenen guc: {super_guc}"
+class Fighter(Pokemon):
+    async def attack(self, enemy):
+        super_power = randint(5, 15)
+        self.power += super_power
+        result = await super().attack(enemy)
+        self.power -= super_power
+        return sonuc + f"\nDovuscu Pokémon süper saldırı kullandı. Eklenen guc: {super_power}"
     
-    async def besle(self):
-        return await super().besle(besleme_araligi=10)
+    async def feed(self):
+        return await super().feed(feed_interval=10)
